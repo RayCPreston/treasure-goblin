@@ -1,0 +1,13 @@
+[gd_resource type="TileSet" format=3 uid="uid://bs3gimkrvupse"]
+
+[ext_resource type="Texture2D" uid="uid://2aajgv3uiwqv" path="res://assets/tilesets/floor.png" id="1_eb2bm"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_g3mbb"]
+texture = ExtResource("1_eb2bm")
+0:0/0 = 0
+0:0/0/custom_data_0 = true
+
+[resource]
+custom_data_layer_0/name = "is_walkable"
+custom_data_layer_0/type = 1
+sources/0 = SubResource("TileSetAtlasSource_g3mbb")
