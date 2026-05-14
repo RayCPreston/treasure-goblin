@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dubpmwqbb20l1"
-path="res://.godot/imported/stair-down.png-7b5b9a7aa54319b81eb1efb5af9b8b5c.ctex"
+uid="uid://bh4mhon7q8rvu"
+path="res://.godot/imported/stair_up.png-994d7319e3e51aa89fc8b6bedee47a9a.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/furniture/stair-down.png"
-dest_files=["res://.godot/imported/stair-down.png-7b5b9a7aa54319b81eb1efb5af9b8b5c.ctex"]
+source_file="res://assets/sprites/furniture/stair_up.png"
+dest_files=["res://.godot/imported/stair_up.png-994d7319e3e51aa89fc8b6bedee47a9a.ctex"]
 
 [params]
 
