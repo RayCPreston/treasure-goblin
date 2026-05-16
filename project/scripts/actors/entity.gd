@@ -5,6 +5,8 @@ extends Node2D
 @export var is_interactable: bool = false
 @export var entity_name: String = ""
 
+signal turn_ended
+
 var cell: Vector2i
 
 func _ready() -> void:
@@ -20,6 +22,9 @@ func interact(_source: Entity) -> void:
 func take_turn() -> void:
 	pass
 
+func end_turn() -> void:
+	turn_ended.emit()
+
 func try_move_to(to_cell: Vector2i) -> void:
 	var occupant: Entity = WorldGrid.get_entity_at_cell(to_cell)
 	if occupant and occupant.is_passable:
@@ -28,7 +33,12 @@ func try_move_to(to_cell: Vector2i) -> void:
 		occupant.interact(self)
 	elif WorldGrid.is_cell_available(to_cell):
 		move_to(to_cell)
-	#TODO: Announce turn to TurnManager
+	else:
+		pass
+	end_turn()
+
+func wait() -> void:
+	end_turn()
 
 func move_to(to_cell: Vector2i) -> void:
 	WorldGrid.move_entity(self, cell, to_cell)

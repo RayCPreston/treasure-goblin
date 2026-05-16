@@ -18,6 +18,8 @@ config/features=PackedStringArray("4.6", "GL Compatibility")
 
 Constants="*uid://dn4xu7g43lada"
 WorldGrid="*uid://mc6pbe4hleqr"
+TurnManager="*uid://ds0m51wbeb6fb"
+PlayerInput="*uid://buekmcf6fhvx4"
 
 [display]
 
