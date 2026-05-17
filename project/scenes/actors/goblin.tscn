@@ -1,17 +1,21 @@
 [gd_scene format=3 uid="uid://c8j8wx37be5o0"]
 
 [ext_resource type="Texture2D" uid="uid://begpvkcbj242k" path="res://assets/sprites/characters/thief.png" id="1_8ji8l"]
+[ext_resource type="Script" uid="uid://dow2qo3gkl06i" path="res://scripts/actors/player.gd" id="1_q6353"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_q6353"]
 size = Vector2(16, 16)
 
 [node name="Node2D" type="Node2D" unique_id=437332451]
 z_index = 5
+script = ExtResource("1_q6353")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1768811708]
 texture = ExtResource("1_8ji8l")
+centered = false
 
 [node name="Area2D" type="Area2D" parent="." unique_id=414150923]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D" unique_id=247864722]
+position = Vector2(8, 8)
 shape = SubResource("RectangleShape2D_q6353")
