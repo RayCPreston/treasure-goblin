@@ -10,8 +10,10 @@ z_index = 2
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1434073251]
 texture = ExtResource("1_5ftpx")
+centered = false
 
 [node name="Area2D" type="Area2D" parent="Sprite2D" unique_id=2062229429]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite2D/Area2D" unique_id=747228971]
+position = Vector2(8, 8)
 shape = SubResource("RectangleShape2D_j8a1s")

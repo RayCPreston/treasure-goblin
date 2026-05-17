@@ -1,17 +1,21 @@
 [gd_scene format=3 uid="uid://djbf04gdrychm"]
 
 [ext_resource type="Texture2D" uid="uid://biwxvygo74h25" path="res://assets/sprites/characters/guard.png" id="1_7ceai"]
+[ext_resource type="Script" uid="uid://ba4rpfm7ldi5n" path="res://scripts/actors/guard.gd" id="1_ed206"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ed206"]
 size = Vector2(16, 16)
 
 [node name="Node2D" type="Node2D" unique_id=978809891]
 z_index = 5
+script = ExtResource("1_ed206")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=407572258]
 texture = ExtResource("1_7ceai")
+centered = false
 
 [node name="Area2D" type="Area2D" parent="." unique_id=127472754]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D" unique_id=456892046]
+position = Vector2(8, 8)
 shape = SubResource("RectangleShape2D_ed206")
