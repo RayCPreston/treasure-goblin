@@ -22,7 +22,6 @@ func is_walkable(cell: Vector2i) -> bool:
 
 func is_opaque(cell: Vector2i) -> bool:
 	if _layers.is_empty():
-		Log.warn("TileQuery: no TileMapLayers initiated.")
 		return false
 	for layer in _layers:
 		var tile_data: TileData = layer.get_cell_tile_data(cell)

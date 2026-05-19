@@ -5,24 +5,13 @@ enum VisionState { UNSEEN, REMEMBERED, VISIBLE }
 var max_range = 10
 var _memory: Dictionary = {}
 
-const _OCTANTS: Array = [
-	[Vector2i(0, -1), Vector2i(1, 0)],   #N
-	[Vector2i(1, -1), Vector2i(0, 1)],   #NE
-	[Vector2i(1, 0),  Vector2i(0, 1)],   # E
-	[Vector2i(1, 1),  Vector2i(0, -1)],  # SE
-	[Vector2i(0, 1),  Vector2i(-1, 0)],  # S
-	[Vector2i(-1, 1), Vector2i(0, -1)],  # SW
-	[Vector2i(-1, 0), Vector2i(0, -1)],  # W
-	[Vector2i(-1,-1), Vector2i(0, 1)],   # NW
-]
-
 func compute(origin: Vector2i) -> Dictionary:
 	for cell in _memory:
 		if _memory[cell] == VisionState.VISIBLE:
 			_memory[cell] = VisionState.REMEMBERED
 	_memory[origin] = VisionState.VISIBLE
-	for octant in range(8):
-		_scan(origin, octant, 1, 0.0, 1.0)
+	for quadrant in range(4):
+		_scan(origin, quadrant, 1, -1.0, 1.0)
 	return _memory
 
 func get_state(cell: Vector2i) -> VisionState:
@@ -31,36 +20,44 @@ func get_state(cell: Vector2i) -> VisionState:
 func is_visible(cell: Vector2i) -> bool:
 	return get_state(cell) == VisionState.VISIBLE
 
-func _scan(origin: Vector2i, octant: int, col_dist: int, start_slope: float, end_slope: float) -> void:
-	if col_dist > max_range:
+func _transform(origin: Vector2i, quadrant: int, row: int, col: int) -> Vector2i:
+	match quadrant:
+		0: return Vector2i(origin.x + col, origin.y - row) #N
+		1: return Vector2i(origin.x + row, origin.y + col) #E
+		2: return Vector2i(origin.x + col, origin.y + row) #S
+		3: return Vector2i(origin.x - row, origin.y + col) #W
+	return origin
+
+func _slope(row: int, col: int) -> float:
+	return float(2 * col - 1) / float(2 * row)
+
+func _is_symmetric(origin: Vector2i, quadrant: int, row: int, col: int, start_slope: float, end_slope: float) -> bool:
+	var world_cell: Vector2i = _transform(origin, quadrant, row, col)
+	var dist: int = maxi(abs(world_cell.x - origin.x), abs(world_cell.y - origin.y))
+	return dist <= max_range \
+		and float(col) >= float(row) * start_slope \
+		and float(col) <= float(row) * end_slope
+
+func _scan(origin: Vector2i, quadrant: int, row: int, start_slope: float, end_slope: float) -> void:
+	if row > max_range:
 		return
-	var col_step: Vector2i = _OCTANTS[octant][0]
-	var row_step: Vector2i = _OCTANTS[octant][1]
-	var previous_was_blocker: bool = false
-	var current_start: float = start_slope
-	var row_min: int = int(floor(start_slope * float(col_dist) + 0.5))
-	var row_max: int = int(floor(end_slope * float(col_dist) + 0.5))
-	for row in range(row_min, row_max + 1):
-		var cell: Vector2i = origin + col_step * col_dist + row_step * row
-		var near_slope: float = (float(row) - 0.5) / (float(col_dist) + 0.5)
-		var far_slope: float = (float(row) + 0.5) / (float(col_dist) - 0.5) \
-			if col_dist > 1 else (float(row) + 0.5) / 0.5
-		if near_slope > end_slope:
-			break
-		if far_slope < current_start:
-			continue
-		var dist: int = maxi(abs(cell.x - origin.x), abs(cell.y - origin.y))
-		if dist <= max_range:
+	if start_slope > end_slope:
+		return
+	var min_col: int = int(floor(float(row) * start_slope + 0.5))
+	var max_col: int = int(floor(float(row) * end_slope - 0.5)) + 1
+	var prev_was_opaque: bool = false
+	for col in range(min_col, max_col + 1):
+		var cell: Vector2i = _transform(origin, quadrant, row, col)
+		var is_opaque: bool = TileManager.is_opaque(cell)
+		var is_symmetric: bool = _is_symmetric(origin, quadrant, row, col, start_slope, end_slope)
+		if is_symmetric:
+			print("Inside 'is_symmetric` condition. Cell=%s q=%d row=%d col=%d start=%.3f end=%.3f" % [cell, quadrant, row, col, start_slope, end_slope])
 			_memory[cell] = VisionState.VISIBLE
-		var opaque: bool = TileManager.is_opaque(cell)
-		if opaque:
-			if not previous_was_blocker:
-				_scan(origin, octant, col_dist + 1, current_start, near_slope)
-			previous_was_blocker = true
-			current_start = far_slope
-		else:
-			if previous_was_blocker:
-				current_start = near_slope
-			previous_was_blocker = false
-	if not previous_was_blocker:
-		_scan(origin, octant, col_dist + 1, current_start, end_slope)
+		if prev_was_opaque and not is_opaque:
+			start_slope = _slope(row, col)
+		if not prev_was_opaque and is_opaque:
+			var next_end: float = _slope(row, col)
+			_scan(origin, quadrant, row + 1, start_slope, next_end)
+		prev_was_opaque = is_opaque
+	if not prev_was_opaque:
+		_scan(origin, quadrant, row + 1, start_slope, end_slope)
