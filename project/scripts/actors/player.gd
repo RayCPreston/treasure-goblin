@@ -8,7 +8,7 @@ var fov: PlayerFov = PlayerFov.new()
 func _ready() -> void:
 	super()
 	TurnManager.register_player(self)
-	_compute_fov()
+	call_deferred("_compute_fov")
 
 func _unhandled_input(event: InputEvent) -> void:
 	if not TurnManager.is_player_turn():
@@ -32,4 +32,5 @@ func wait() -> void:
 	super()
 
 func _compute_fov() -> void:
+	print("[FOV] computing at cell=%s  TileManager ready=%s" % [cell, TileManager.is_opaque(cell)])
 	vision_updated.emit(fov.compute(cell))

@@ -4,6 +4,7 @@ extends Node2D
 @export var is_passable: bool = false
 @export var is_interactable: bool = false
 @export var entity_name: String = ""
+@export var hide_if_not_visible = true
 @export var tween_duration: float = 0.1
 
 signal turn_ended
@@ -66,7 +67,16 @@ func tweened_move(target_cell: Vector2i) -> void:
 		.set_ease(Tween.EASE_OUT)
 
 func refresh_visibility() -> void:
-	modulate = VisionManager.get_cell_color(cell)
+	if not hide_if_not_visible:
+		return
+	var visibility_state = VisionManager.get_state(cell)
+	match visibility_state:
+		PlayerFov.VisionState.VISIBLE:
+			visible = true
+			modulate = VisionManager.COLOR_VISIBLE
+		PlayerFov.VisionState.REMEMBERED, PlayerFov.VisionState.UNSEEN:
+			visible = false
+	
 
 func world_to_cell(world_pos: Vector2) -> Vector2i:
 	return Vector2i(world_pos / Constants.TILE_SIZE)

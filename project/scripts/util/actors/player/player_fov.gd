@@ -41,17 +41,19 @@ func _is_symmetric(origin: Vector2i, quadrant: int, row: int, col: int, start_sl
 func _scan(origin: Vector2i, quadrant: int, row: int, start_slope: float, end_slope: float) -> void:
 	if row > max_range:
 		return
-	if start_slope > end_slope:
+	if start_slope >= end_slope:
 		return
 	var min_col: int = int(floor(float(row) * start_slope + 0.5))
-	var max_col: int = int(floor(float(row) * end_slope - 0.5)) + 1
+	var max_col: int = int(ceil(float(row) * end_slope - 0.5))
 	var prev_was_opaque: bool = false
 	for col in range(min_col, max_col + 1):
 		var cell: Vector2i = _transform(origin, quadrant, row, col)
 		var is_opaque: bool = TileManager.is_opaque(cell)
 		var is_symmetric: bool = _is_symmetric(origin, quadrant, row, col, start_slope, end_slope)
-		if is_symmetric:
-			print("Inside 'is_symmetric` condition. Cell=%s q=%d row=%d col=%d start=%.3f end=%.3f" % [cell, quadrant, row, col, start_slope, end_slope])
+		if is_opaque or is_symmetric:
+			if is_symmetric and cell == Vector2i(23, 6):
+				print("[FOV] (23,6) revealed as FLOOR via symmetry: q=%d row=%d col=%d start=%.3f end=%.3f" % [quadrant, row, col, start_slope, end_slope])
+				print("[FOV] (23,6) is_opaque=%s" % TileManager.is_opaque(cell))
 			_memory[cell] = VisionState.VISIBLE
 		if prev_was_opaque and not is_opaque:
 			start_slope = _slope(row, col)
