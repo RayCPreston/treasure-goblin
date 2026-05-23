@@ -6,7 +6,7 @@ extends Node2D
 @export var can_overlap: bool = false
 @export var is_interactable: bool = false
 @export var is_furniture: bool = false
-@export var hide_if_not_visible: bool = true
+@export var can_be_remembered: bool = true
 @export var can_hide_player: bool = false
 @export var blocks_vision = false
 @export var allows_player_vision: bool = false
@@ -79,14 +79,18 @@ func tweened_move(target_cell: Vector2i) -> void:
 		.set_ease(Tween.EASE_OUT)
 
 func refresh_visibility() -> void:
-	if not hide_if_not_visible:
-		return
 	var visibility_state = VisionManager.get_state(cell)
 	match visibility_state:
 		PlayerFov.VisionState.VISIBLE:
 			visible = true
 			modulate = VisionManager.COLOR_VISIBLE
-		PlayerFov.VisionState.REMEMBERED, PlayerFov.VisionState.UNSEEN:
+		PlayerFov.VisionState.REMEMBERED:
+			if can_be_remembered:
+				modulate = VisionManager.COLOR_REMEMBERED
+				visible = true
+			else:
+				visible = false
+		PlayerFov.VisionState.UNSEEN:
 			visible = false
 	
 

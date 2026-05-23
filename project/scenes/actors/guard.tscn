@@ -9,6 +9,7 @@ size = Vector2(16, 16)
 [node name="Node2D" type="Node2D" unique_id=978809891]
 z_index = 5
 script = ExtResource("1_ed206")
+can_be_remembered = false
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=407572258]
 texture = ExtResource("1_7ceai")
