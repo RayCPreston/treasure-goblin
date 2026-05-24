@@ -1,24 +1,37 @@
 class_name Entity
 extends Node2D
 
-@export var is_passable: bool = false
-@export var is_interactable: bool = false
 @export var entity_name: String = ""
-@export var hide_if_not_visible = true
-@export var tween_duration: float = 0.1
+var can_swap: bool = false
+var can_overlap: bool = false
+var is_interactable: bool = false
+var is_furniture: bool = false
+var can_be_remembered: bool = true
+var can_hide_player: bool = false
+var blocks_vision: bool = false
+var allows_player_vision: bool = false
+var tween_duration: float = 0.3
 
 signal turn_ended
+
+enum  Proximity { NONE, ADJACENT, OVERLAPPED }
 
 var cell: Vector2i
 var _tween: Tween
 
 func _ready() -> void:
 	cell = world_to_cell(position)
-	GridManager.register(self, cell)
+	if is_furniture:
+		GridManager.register_furniture(self, cell)
+	else:
+		GridManager.register_actor(self, cell)
 	VisionManager.cell_state_changed.connect(refresh_visibility)
 
 func _exit_tree() -> void:
-	GridManager.unregister(cell)
+	if is_furniture:
+		GridManager.unregister_furniture(cell)
+	else:
+		GridManager.unregister_actor(cell)
 
 func interact(_source: Entity) -> void:
 	pass
@@ -26,35 +39,42 @@ func interact(_source: Entity) -> void:
 func take_turn() -> void:
 	pass
 
+func on_proximity_changed(_proximity: Proximity, _entity: Entity) -> void:
+	pass
+
 func end_turn() -> void:
 	turn_ended.emit()
 
 func try_move_to(to_cell: Vector2i) -> void:
-	var occupant: Entity = GridManager.get_entity_at_cell(to_cell)
-	if occupant and occupant.is_passable:
+	var furniture: Entity = GridManager.get_furniture_at_cell(to_cell)
+	if furniture and not furniture.can_overlap:
+		end_turn()
+		return
+	var occupant: Entity = GridManager.get_actor_at_cell(to_cell)
+	if occupant and occupant.can_swap:
 		swap_with(occupant)
 	elif occupant and occupant.is_interactable:
 		occupant.interact(self)
 	elif GridManager.is_cell_available(to_cell):
 		move_to(to_cell)
-	else:
-		pass
 	end_turn()
 
 func wait() -> void:
 	end_turn()
 
 func move_to(to_cell: Vector2i) -> void:
-	GridManager.move_entity(self, cell, to_cell)
+	var from_cell: Vector2i = cell
 	cell = to_cell
+	GridManager.move_entity(self, from_cell, to_cell)
 	tweened_move(to_cell)
 
 func swap_with(other: Entity) -> void:
+	var my_cell: Vector2i = cell
 	var other_cell: Vector2i = other.cell
-	GridManager.swap_entities(self, other)
-	other.cell = cell
-	other.tweened_move(cell)
 	cell = other_cell
+	other.cell = my_cell
+	GridManager.swap_entities(self, other)
+	other.tweened_move(my_cell)
 	tweened_move(other_cell)
 
 func tweened_move(target_cell: Vector2i) -> void:
@@ -67,14 +87,18 @@ func tweened_move(target_cell: Vector2i) -> void:
 		.set_ease(Tween.EASE_OUT)
 
 func refresh_visibility() -> void:
-	if not hide_if_not_visible:
-		return
 	var visibility_state = VisionManager.get_state(cell)
 	match visibility_state:
 		PlayerFov.VisionState.VISIBLE:
 			visible = true
 			modulate = VisionManager.COLOR_VISIBLE
-		PlayerFov.VisionState.REMEMBERED, PlayerFov.VisionState.UNSEEN:
+		PlayerFov.VisionState.REMEMBERED:
+			if can_be_remembered:
+				modulate = VisionManager.COLOR_REMEMBERED
+				visible = true
+			else:
+				visible = false
+		PlayerFov.VisionState.UNSEEN:
 			visible = false
 	
 
