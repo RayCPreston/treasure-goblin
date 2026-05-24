@@ -3,25 +3,30 @@ extends Node
 var _actors: Dictionary = {}
 var _furniture: Dictionary = {}
 
-func register(entity: Entity, cell: Vector2i) -> void:
-	if entity.is_furniture:
-		_furniture[cell] = entity
-	else:
-		_actors[cell] = entity
+func register_actor(entity: Entity, cell: Vector2i) -> void:
+	print("registering actor:", entity.entity_name)
+	_actors[cell] = entity
 
-func unregister(cell: Vector2i) -> void:
+func register_furniture(entity: Entity, cell: Vector2i) -> void:
+	print("registering furniture:", entity.entity_name)
+	_furniture[cell] = entity
+
+func unregister_actor(cell: Vector2i) -> void:
 	_actors.erase(cell)
+
+func unregister_furniture(cell: Vector2i) -> void:
 	_furniture.erase(cell)
 
 func move_entity(entity: Entity, from_cell: Vector2i, to_cell: Vector2i) -> void:
-	unregister(from_cell)
-	register(entity, to_cell)
-	notify_entity_moved(entity)
+	unregister_actor(from_cell)
+	register_actor(entity, to_cell)
+	notify_entity_moved(entity, from_cell)
+	notify_entity_moved(entity, to_cell)
 
-func notify_entity_moved(entity: Entity) -> void:
-	for x in range(-2, 3):
-		for y in range(-2, 3):
-			var neighbor_cell: Vector2i = entity.cell + Vector2i(x, y)
+func notify_entity_moved(entity: Entity, cell: Vector2i) -> void:
+	for x in range(-1, 2):
+		for y in range(-1, 2):
+			var neighbor_cell: Vector2i = cell + Vector2i(x, y)
 			var proximity: Entity.Proximity = _get_proximity(entity.cell, neighbor_cell)
 			var actor: Entity = get_actor_at_cell(neighbor_cell)
 			if actor:
@@ -43,7 +48,10 @@ func swap_entities(entity_a: Entity, entity_b: Entity) -> void:
 	var cell_b := entity_b.cell
 	_actors[cell_a] = entity_b
 	_actors[cell_b] = entity_a
-	notify_entity_moved(entity_a)
+	notify_entity_moved(entity_a, cell_a) 
+	notify_entity_moved(entity_a, cell_b)
+	notify_entity_moved(entity_b, cell_b)
+	notify_entity_moved(entity_b, cell_a)
 
 func get_actor_at_cell(cell: Vector2i) -> Entity:
 	return _actors.get(cell, null)

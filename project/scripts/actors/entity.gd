@@ -2,15 +2,15 @@ class_name Entity
 extends Node2D
 
 @export var entity_name: String = ""
-@export var can_swap: bool = false
-@export var can_overlap: bool = false
-@export var is_interactable: bool = false
-@export var is_furniture: bool = false
-@export var can_be_remembered: bool = true
-@export var can_hide_player: bool = false
-@export var blocks_vision = false
-@export var allows_player_vision: bool = false
-@export var tween_duration: float = 0.3
+var can_swap: bool = false
+var can_overlap: bool = false
+var is_interactable: bool = false
+var is_furniture: bool = false
+var can_be_remembered: bool = true
+var can_hide_player: bool = false
+var blocks_vision: bool = false
+var allows_player_vision: bool = false
+var tween_duration: float = 0.3
 
 signal turn_ended
 
@@ -21,11 +21,17 @@ var _tween: Tween
 
 func _ready() -> void:
 	cell = world_to_cell(position)
-	GridManager.register(self, cell)
+	if is_furniture:
+		GridManager.register_furniture(self, cell)
+	else:
+		GridManager.register_actor(self, cell)
 	VisionManager.cell_state_changed.connect(refresh_visibility)
 
 func _exit_tree() -> void:
-	GridManager.unregister(cell)
+	if is_furniture:
+		GridManager.unregister_furniture(cell)
+	else:
+		GridManager.unregister_actor(cell)
 
 func interact(_source: Entity) -> void:
 	pass
@@ -57,16 +63,18 @@ func wait() -> void:
 	end_turn()
 
 func move_to(to_cell: Vector2i) -> void:
-	GridManager.move_entity(self, cell, to_cell)
+	var from_cell: Vector2i = cell
 	cell = to_cell
+	GridManager.move_entity(self, from_cell, to_cell)
 	tweened_move(to_cell)
 
 func swap_with(other: Entity) -> void:
+	var my_cell: Vector2i = cell
 	var other_cell: Vector2i = other.cell
-	GridManager.swap_entities(self, other)
-	other.cell = cell
-	other.tweened_move(cell)
 	cell = other_cell
+	other.cell = my_cell
+	GridManager.swap_entities(self, other)
+	other.tweened_move(my_cell)
 	tweened_move(other_cell)
 
 func tweened_move(target_cell: Vector2i) -> void:

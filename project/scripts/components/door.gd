@@ -4,11 +4,13 @@ extends Entity
 @onready var _sprite: AnimatedSprite2D = $AnimatedSprite2D
 
 func _ready() -> void:
+	is_furniture = true
+	blocks_vision = true
+	can_overlap = true
 	super()
 	_sprite.play("closed")
 
 func on_proximity_changed(proximity: Proximity, entity: Entity) -> void:
-	print("proximity changed: %s" % proximity)
 	match proximity:
 		Proximity.NONE:
 			set_closed()
