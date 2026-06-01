@@ -7,7 +7,7 @@ const MAX_TILE_HEIGHT: int = 60
 
 @export var map_tile_width: int = 72
 @export var map_tile_height: int = 45
-@export var hud_margin_right: int = 128
+#@export var hud_margin_right: int = 128
 
 func get_map_pixel_width() -> int:
 	return map_tile_width * Constants.TILE_SIZE
