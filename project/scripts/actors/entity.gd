@@ -15,6 +15,7 @@ var tween_duration: float = 0.3
 signal turn_ended
 
 enum  Proximity { NONE, ADJACENT, OVERLAPPED }
+enum Facing { NORTH = 270, EAST = 0, SOUTH = 90, WEST = 180 }
 
 var cell: Vector2i
 var _tween: Tween
