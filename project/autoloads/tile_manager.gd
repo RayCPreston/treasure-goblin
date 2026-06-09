@@ -32,11 +32,6 @@ func is_opaque(cell: Vector2i) -> bool:
 			return true
 	return false
 
-func set_cell_modulate(cell: Vector2i, color: Color) -> void:
-	for layer in _layers:
-		if layer.get_cell_source_id(cell) != -1:
-			layer.set_cell_modulate(cell, color)
-
 func notify_vision_update() -> void:
 	for layer in _layers:
 		layer.notify_runtime_tile_data_update()
