@@ -7,6 +7,7 @@ var fov: PlayerFov = PlayerFov.new()
 
 func _ready() -> void:
 	super()
+	VisionManager.initialize_player(self)
 	TurnManager.register_player(self)
 	call_deferred("_compute_fov")
 	call_deferred("_emit_position")

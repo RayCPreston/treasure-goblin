@@ -1,7 +1,7 @@
 class_name GuardFov
 
-const HALF_ARC_DEGREES: float = 45.0
-const INNER_RANGE: int = 4
+const HALF_ARC_DEGREES: float = 27.5
+const INNER_RANGE: int = 3
 const OUTER_RANGE: int = 8
 
 func compute(origin: Vector2i, facing: Guard.Facing) -> Array[Array]:
