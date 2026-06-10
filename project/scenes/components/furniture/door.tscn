@@ -46,12 +46,9 @@ animations = [{
 size = Vector2(16, 16)
 
 [node name="Node2D" type="Node2D" unique_id=1598990894]
-z_index = 2
+z_index = 10
 script = ExtResource("1_j8a1s")
 entity_name = "door"
-can_overlap = true
-is_furniture = true
-blocks_vision = true
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=864068385]
 sprite_frames = SubResource("SpriteFrames_mg3jv")
